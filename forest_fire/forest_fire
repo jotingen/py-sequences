@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+
+#https://oeis.org/A005132
+
+#a(0) = 0; for n > 0, a(n) = a(n-1) - n if nonnegative and not already in the sequence, otherwise a(n) = a(n-1) + n.
+
+import matplotlib.animation as ani
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import random
+import sys
+import math
+
+
+fig = plt.figure()
+ax = plt.axes(xlim=(0,0), ylim=(0,0))
+plt.title("Forest Fire")
+
+seq = []
+def nextValue():
+
+     ndx = len(seq)
+     if ndx == 0 or ndx == 1:
+         print("ForestFire(%d) = %d" % (ndx, 1))
+         seq.append(1)
+         return
+
+     val = 1
+     #Loop until we are clean and can break out
+     cleared = 0
+     while not cleared:
+         cleared = 1
+         for n in range(1,int(ndx/2)):
+             if val - seq[ndx-n] == seq[ndx-n] - seq[ndx-2*n]:
+                 cleared = 0
+                 val += 1
+                 break
+
+
+
+     print("ForestFire(%d) = %d" % (ndx, val))
+     seq.append(val)
+     return
+
+
+xdata = []
+
+
+count = 0
+def animate(i=int):
+    global count
+    grp_size = int(math.exp(count**.3))
+    count += 1
+    initial = len(seq)
+
+    for v in range(0,grp_size): #Do grp_size between updates
+        nextValue()
+        xdata.append(len(seq))
+
+    ax.set_ylim([min(seq),max(seq)])
+    ax.set_xlim([0,len(seq)])
+
+    #if count == 4:
+    #    sys.exit(1)
+    return plt.scatter(xdata[initial:-1],seq[initial:-1],s=1,c='Blue',alpha=.1)
+
+animator = ani.FuncAnimation(fig, animate, interval = 100)
+plt.show()
